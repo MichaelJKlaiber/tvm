@@ -498,7 +498,15 @@ ExportableModule = typing.Union[
 ]
 
 
-def export_model_library_format(mod: ExportableModule, file_name: typing.Union[str, pathlib.Path]):
+def _write_external_files(source_dir, external_files: dict):
+    for filename, source in external_files.items():
+        with open(pathlib.Path(source_dir, filename), "w") as external_file:
+            external_file.write(source)
+
+
+def export_model_library_format(mod: ExportableModule,
+                                file_name: typing.Union[str, pathlib.Path],
+                                external_files: dict = None):
     """Export the build artifact in Model Library Format.
 
     This function creates a .tar archive containing the build artifacts in a standardized
@@ -530,6 +538,8 @@ def export_model_library_format(mod: ExportableModule, file_name: typing.Union[s
         _export_graph_model_library_format(mod, tempdir.path)
     else:
         raise NotImplementedError(f"Don't know how to export module of type {mod.__class__!r}")
+
+    _write_external_files(tempdir.path, external_files)
 
     _make_tar(tempdir.path, file_name, mod)
 
