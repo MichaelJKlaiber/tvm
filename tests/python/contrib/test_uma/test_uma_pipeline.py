@@ -209,14 +209,6 @@ def test_vanilla_accelerator_integration(url: str):
 
 
 def _vanilla_accelerator_run(mod, params, input_shapes, output_shapes):
-    interface_api = "c"
-    use_unpacked_api = True
-
-    uma_backend = VanillaAcceleratorBackend()
-    uma_backend.register()
-    mod = uma_backend.partition(mod)
-    target = tvm.target.Target("vanilla_accelerator", host=tvm.target.Target("c"))
-
     def _generate_runtime_data(
         input_shapes: dict, output_shapes: dict
     ) -> [OrderedDict, OrderedDict]:
@@ -229,15 +221,25 @@ def _vanilla_accelerator_run(mod, params, input_shapes, output_shapes):
         oshape = output_shapes[oname]
         i_data = np.random.uniform(0, 1, ishape).astype("float32")
         o_data = np.random.uniform(0, 1, oshape).astype("float32")
+        #oname = "output"
         inputs = OrderedDict([(iname, i_data)])
         outputs = OrderedDict([(oname, o_data)])
         return inputs, outputs
+
+    interface_api = "c"
+    use_unpacked_api = True
+
+    uma_backend = VanillaAcceleratorBackend()
+    uma_backend.register()
+    mod = uma_backend.partition(mod)
+    target = tvm.target.Target("vanilla_accelerator", host=tvm.target.Target("c"))
+    target_c = tvm.target.Target("c")
 
     input_list, output_list = _generate_runtime_data(input_shapes, output_shapes)
     aot_test_model = AOTTestModel(module=mod, inputs=input_list, outputs=output_list)
     test_runner = AOT_DEFAULT_RUNNER
 
-    compile_and_run(aot_test_model, test_runner, interface_api, use_unpacked_api, target=target)
+    compile_and_run(aot_test_model, test_runner, interface_api, use_unpacked_api, target=[target_c, target])
 
     compiled_test_mods = compile_models(
         models=AOTTestModel(module=mod, inputs=input_list, outputs=output_list),
@@ -256,7 +258,7 @@ def _vanilla_accelerator_run(mod, params, input_shapes, output_shapes):
         interface_api=interface_api,
     )
 
-    aot_test_model = AOTTestModel(module=mod, inputs=inputs, outputs=output_list, params=params)
+    aot_test_model = AOTTestModel(module=mod, inputs=input_list, outputs=output_list, params=params)
 
     runner = AOTTestRunner(pass_config={"tir.usmp.enable": True})
 
@@ -283,4 +285,4 @@ if __name__ == "__main__":
         "https://github.com/onnx/models/raw/main/vision/classification/mnist/model/mnist-12.onnx"
     )
     # test_tflite_model_u1_usecase(MOBILENET_V1_URL, "greedy_by_size", 4845696, 8468008)
-    # test_conv2d("c", True, AOT_DEFAULT_RUNNER, 1, 32)
+    #test_conv2d("c", True, AOT_DEFAULT_RUNNER, 1, 32)
