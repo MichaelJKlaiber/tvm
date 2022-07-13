@@ -65,9 +65,3 @@ class VanillaAcceleratorBackend(UMABackend):
     @property
     def target_name(self):
         return "vanilla_accelerator"
-
-
-# def gen_includes() -> str:
-#     includes = ""
-#     includes += "#include \"../../../../python/tvm/relay/backend/contrib/uma/vanilla_accelerator/conv2dnchw.cpp\""
-#     return includes

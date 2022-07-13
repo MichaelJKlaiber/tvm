@@ -855,7 +855,7 @@ def compile_and_run(
     enable_op_fusion: bool = True,
     data_linkage: AOTDataLinkage = None,
     use_runtime_executor: bool = True,
-    target: Union[str, tvm.target.Target] = "c",
+    target: Union[str, tvm.target.Target, List[tvm.target.Target]] = "c",
     target_opts: Dict = None,
     test_dir: str = None,
     verbose: bool = False,
