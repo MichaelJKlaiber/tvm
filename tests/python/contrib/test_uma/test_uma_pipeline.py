@@ -14,36 +14,22 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-from os.path import join
-from typing import Union, List, Dict, Any
 
 import pytest
-from tests.python.relay.aot.test_crt_aot_usmp import (
-    _check_for_no_tvm_backendallocworkspace_calls,
-    MOBILENET_V1_URL,
-)
-from tvm.contrib.download import download_testdata
 from tvm.micro.testing.aot_test_utils import AOT_DEFAULT_RUNNER
-from tvm.relay import testing, transform
+from tvm.relay import transform
 from tvm.testing.aot import (
-    run_and_check,
     AOTTestModel,
-    AOTCompiledTestModel,
     AOTTestRunner,
-    create_relay_module_and_inputs_from_tflite_file,
     generate_ref_data,
     compile_and_run,
 )
 
 import tvm
 from test_uma_vanilla_accelerator import VanillaAcceleratorBackend
-from tvm import relay, IRModule
+from tvm import relay
 import numpy as np
 from collections import OrderedDict
-from tvm.micro import model_library_format as mlf
-
-import onnx
-from tvm.testing.aot import compile_models
 
 
 @pytest.mark.parametrize(
@@ -64,7 +50,7 @@ def test_conv2d(interface_api, use_unpacked_api, test_runner, groups, weight_sha
         test_runner,
         interface_api,
         use_unpacked_api,
-        target=target,
+        target=target
     )
 
 
