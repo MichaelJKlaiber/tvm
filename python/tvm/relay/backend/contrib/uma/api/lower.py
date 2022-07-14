@@ -19,6 +19,7 @@
 from typing import List, Tuple, Callable, Optional
 
 import tvm
+from tvm.relay.op.strategy.generic import schedule_injective
 from . import _ffi_api
 from tvm import relay, te
 from tvm.relay.op.op import register_strategy
@@ -87,6 +88,8 @@ class UMALower:
         tir_prim_func = tir_prim_func.with_attr(
             "global_symbol", relay_prim_func.attrs["global_symbol"]
         )
+        assert tvm.target.Target.current() is not None
+        assert tvm.target.Target.current().kind.name == self.target_name
         tir_prim_func = tir_prim_func.with_attr("target", tvm.target.Target.current())
         tir_prim_func = tir_prim_func.with_attr("relay_attrs", relay_prim_func.attrs)
         return tir_prim_func
